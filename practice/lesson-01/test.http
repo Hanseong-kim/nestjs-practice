@@ -1,0 +1,20 @@
+### 1. 회원가입 (Signup)
+POST http://localhost:3000/users/signup
+Content-Type: application/json
+
+{
+  "email": "hansung@test.com",
+  "password": "qwer"
+}
+
+### 2. 게시물 생성 (Create Post)
+POST http://localhost:3000/posts
+Content-Type: application/json
+
+{
+  "title": "인턴 첫 게시물",
+  "content": "서버가 잘 돌아갑니다!"
+}
+
+### 3. 내 글 확인 (Get My Posts)
+GET http://localhost:3000/posts/my-posts?userId=1
