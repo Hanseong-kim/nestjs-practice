@@ -30,9 +30,10 @@ A REST API project built with NestJS and PostgreSQL, implementing user managemen
 - **Get Posts**: Retrieve all posts or a specific post by ID
 - **Delete Post**: Remove a specific post from the database
 
-### 🔗 Relationship
-- `User` : `Post` = **1:N (One-to-Many)** relationship mapping
-- Foreign key integration and **data integrity verified** via TypeORM
+### 🔗 Relationship & Data Integrity
+- **1:N (One-to-Many)**: A single user can own multiple posts.
+- **ON DELETE CASCADE**: Explicitly implemented to ensure that when a `User` is deleted, all associated `Post` records are automatically removed by the RDBMS.
+- **Foreign Key Enforcement**: Verified that posts cannot be created for non-existent users (prevents orphaned data).
 
 ---
 
@@ -92,7 +93,34 @@ npm run start:dev
 
 ### 3. Test the API
 - Open the **`test.http`** file in the project root with VS Code (REST Client extension) to run all API endpoints with a single click.
-- Also tested via `curl` commands for direct request validation.
+- Direct CLI (curl): Use the following sequence to verify the core logic (especially Cascade Delete).
+  
+Step A: Create a User & Get ID
+'''bash
+curl -X POST http://localhost:3000/users/signup \
+     -H "Content-Type: application/json" \
+     -d '{"email": "jacob@unist.ac.kr", "password": "password123"}'
+'''
+Step B: Create a Post linked to the User
+'''
+curl -X POST http://localhost:3000/posts \
+     -H "Content-Type: application/json" \
+     -d '{"title": "CASCADE Test", "content": "Testing auto-delete", "userId": 2}'
+'''
+
+Step C: Verify Relationship (Get All Posts)
+'''
+Bash
+curl -X GET http://localhost:3000/posts
+'''
+Step D: Trigger Cascade Delete (Delete User)
+'''Bash
+curl -X DELETE http://localhost:3000/users/2
+'''
+Step E: Final Verification
+'''Bash
+curl -X GET http://localhost:3000/posts
+'''
 
 > 💡 **Tip for Reviewers**: Opening `test.http` in VS Code allows you to execute and verify every API endpoint instantly without any additional setup.
 
@@ -130,3 +158,12 @@ src/
   3. Reconstructed missing boilerplate files including `package.json` and `main.ts`.
   4. Re-mapped existing PostgreSQL database entities and verified full data consistency.
 - **Learning**: Reinforced the importance of committing and pushing work to remote regularly during development.
+
+- ### [Case: Git Submodule & Index Mismatch]
+- **Issue**: Presence of nested `.git` directories caused the project folder to be treated as an unpopulated submodule, preventing the source code from appearing on GitHub.
+- **Action**: Removed internal `.git` folders, cleared the Git cache (`git rm --cached`), and re-indexed the project from the root.
+- **Learning**: Gained clarity on how Git manages nested repositories and the importance of a clean repository root.
+
+### [Case: Foreign Key Constraint Error (500)]
+- **Issue**: Encountered a `500 Internal Server Error` when trying to create a post with a non-existent `userId`.
+- **Action**: Confirmed the database's referential integrity was working as intended. Adjusted the test sequence to ensure a user exists before post creation.
