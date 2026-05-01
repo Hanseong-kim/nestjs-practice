@@ -96,31 +96,30 @@ npm run start:dev
 - Direct CLI (curl): Use the following sequence to verify the core logic (especially Cascade Delete).
   
 Step A: Create a User & Get ID
-'''bash
+```bash
 curl -X POST http://localhost:3000/users/signup \
      -H "Content-Type: application/json" \
      -d '{"email": "jacob@unist.ac.kr", "password": "password123"}'
-'''
+```
 Step B: Create a Post linked to the User
-'''
+```
 curl -X POST http://localhost:3000/posts \
      -H "Content-Type: application/json" \
      -d '{"title": "CASCADE Test", "content": "Testing auto-delete", "userId": 2}'
-'''
+```
 
 Step C: Verify Relationship (Get All Posts)
-'''
-Bash
+```Bash
 curl -X GET http://localhost:3000/posts
-'''
+```
 Step D: Trigger Cascade Delete (Delete User)
-'''Bash
+```Bash
 curl -X DELETE http://localhost:3000/users/2
-'''
+```
 Step E: Final Verification
-'''Bash
+```Bash
 curl -X GET http://localhost:3000/posts
-'''
+```
 
 > 💡 **Tip for Reviewers**: Opening `test.http` in VS Code allows you to execute and verify every API endpoint instantly without any additional setup.
 
